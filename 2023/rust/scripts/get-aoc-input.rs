@@ -8,6 +8,7 @@
 //! clap = { version = "4.2", features = ["derive"] }
 //! nom = "7.1.3"
 //! reqwest = { version = "0.11.22", features=["blocking"] }
+//! dotenv = "0.15.0"
 //! ```
 
 use clap::{error::ErrorKind, CommandFactory, Parser};
@@ -19,6 +20,7 @@ use reqwest::{blocking::Client, header::COOKIE};
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
+use dotenv::dotenv;
 
 #[derive(Parser, Debug)]
 #[clap(version)]
@@ -40,6 +42,7 @@ fn parse_day(input: &str) -> IResult<&str, u32> {
 }
 
 fn main() -> Result<(), reqwest::Error> {
+    dotenv().ok();
     let session = std::env::var("SESSION")
         .expect("should have a session token set");
     let args = Args::parse();
