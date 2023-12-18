@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use nom::{
     multi::separated_list1, 
     character::complete::{self, line_ending, alpha1},
@@ -8,7 +10,7 @@ use nom::{
 use crate::custom_error::AocError;
 
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord)]
 enum Color {
     Red,
     Green,
@@ -33,39 +35,21 @@ struct Cube {
 
 #[derive(Debug)]
 struct Game {
-    id: u32,
+    //id: u32,
     rounds: Vec<Vec<Cube>>,
 }
 
 impl Game {
-    fn check_if_it_works(&self, max_red: u32, max_green: u32, max_blue: u32) -> u32 {
-        self.rounds.iter().map(| cubes | {
+    fn get_minimum_product(&self) -> u32 {
 
-            dbg!(cubes);
-            let mut current_red = 0;
-            let mut current_green = 0;
-            let mut current_blue = 0;
+        let map: BTreeMap<&Color, u32> = BTreeMap::new();
+
+        self.rounds.iter().fold(map,|mut acc, cubes| {
             for cube in cubes.iter() {
-                match cube.color {
-                    Color::Red => {
-                        if cube.count > current_red { current_red = cube.count };
-                     } ,
-                    Color::Green => {
-                        if cube.count > current_green { current_green = cube.count };
-                    } ,
-                    Color::Blue => {
-                        if cube.count > current_blue { current_blue = cube.count };
-                    },
-                }
+                acc.entry(&cube.color).and_modify(|e| *e = (*e).max(cube.count)).or_insert(cube.count);
             }
-
-            (current_red, current_green, current_blue)
-        }).collect::<Vec<(u32,u32,u32)>>().into_iter().map(|(r,g,b)| {
-            dbg!(r,g,b);
-           r*g*b 
-        }).inspect(|c| {
-            dbg!(c);
-        }).sum()
+            acc
+        }).values().product()
 
         
     }
@@ -86,7 +70,7 @@ fn cube(input: &str) -> IResult<&str, Cube> {
 }
 
 fn game(input: &str) -> IResult<&str, Game> {
-    let (input, id) = preceded(tag("Game "), complete::u32)(input)?;
+    let (input, _id) = preceded(tag("Game "), complete::u32)(input)?;
     let (input, rounds) = preceded(
         tag(": "), 
         separated_list1(tag("; "), 
@@ -101,7 +85,6 @@ fn game(input: &str) -> IResult<&str, Game> {
     //dbg!(&rounds);
 
     Ok((input, Game{
-        id,
         rounds,
     }))
 }
@@ -115,7 +98,7 @@ pub fn process(
     let (_, games) = separated_list1(line_ending, game)(input).expect("should always work");
 
     let score = games.iter().map(| game | {
-        game.check_if_it_works(12, 13, 14)
+        game.get_minimum_product()
     }).sum::<u32>();
 
     Ok(score.to_string())

@@ -114,12 +114,12 @@ pub fn process(
         match game.check_if_it_works(12, 13, 14) {
             true => {
                 //dbg!(game);
-                return game.id
+                game.id
             },
             false => {
 
                 //dbg!("not possible");
-                return 0
+                0
             },
         }
     }).sum::<u32>();
