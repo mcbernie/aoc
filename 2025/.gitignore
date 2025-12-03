@@ -3,3 +3,5 @@ day-*.bench.txt
 .env
 .envrc
 .DS_Store
+input1.txt
+input2.txt

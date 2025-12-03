@@ -1,11 +1,11 @@
 set dotenv-load
 
-set shell := ["bash"]
+#set shell := ["bash"]
 
 set windows-shell := ["powershell", "-NoLogo", "-Command"]
 
 default:
-    @just --list
+    just --list
 
 # Use `just work day-01 part1` to work on the specific binary for a specific day's problems
 work day part:
